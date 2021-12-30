@@ -4,18 +4,20 @@ const cookieParser = require("cookie-parser");
 const cors = require("cors");
 
 // Load env vars
-dotenv.config({path: "./config/config.env"});
+dotenv.config({ path: "./config/config.env" });
 
 const environment = process.env.NODE_ENV || "development";
 
-// const db = require("./config/db");
+const db = require("./config/db");
 
 // // Connect to database
-// db.authenticate().then(() => {
-//   console.log("Connection has been established successfully.");
-// }).catch(() => {
-//   console.error("Unable to connect to the database:", error);
-// });
+db.authenticate()
+  .then(() => {
+    console.log("Connection has been established successfully.");
+  })
+  .catch(() => {
+    console.error("Unable to connect to the database");
+  });
 
 // Route files
 const todoRoute = require("./routes/todo.route");
@@ -24,7 +26,7 @@ const app = express();
 
 // Body parser
 
-app.use(express.urlencoded({extended: false}));
+app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 
 // Cookie parser
@@ -39,14 +41,16 @@ const basePath = "/api/v1";
 // Mount routers
 app.use(basePath + "/todo", todoRoute);
 
-
 app.get("*", function (req, res) {
-  res.status(404).json({success: false, message: "Request not found"});
+  res.status(404).json({ success: false, message: "Request not found" });
 });
 
 const PORT = process.env.PORT || 5000;
 
-const server = app.listen(PORT, console.log(`Server running in ${environment} mode on port ${PORT}`));
+const server = app.listen(
+  PORT,
+  console.log(`Server running in ${environment} mode on port ${PORT}`)
+);
 
 // Handle unhandled promise rejections
 process.on("unhandledRejection", (err, promise) => {
